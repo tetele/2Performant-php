@@ -964,12 +964,14 @@ class TPerformant {
 	
 	function hook($url,$expected, $send = null, $method = 'GET', $where = 'main') {
 		$response = $this->request($url, $send, $method, $where);
-		$returned = json_decode($response);
+		$returned = json_decode(utf8_encode($response));
 		$result = null;
-		
+
 		if($returned === NULL)
-			if($method != 'DELETE')
+			if($method != 'DELETE'){ 
+                $this->logJsonError();
 				throw new TPException_Transport($this, 'Unable to parse response from API', null, $response);
+            }
 			else
 				return true;
 		if(isset($returned->error))
@@ -1028,7 +1030,7 @@ class TPerformant {
                 try {
                 	$response = $req->send();
                 } catch(HTTP_Request2_Exception $e) {
-                	throw new TPException_Connection($this, 'Unable to send simple request to API server', $e);
+                	throw new TPException_Connection($this, 'Unable to send simple request to API server {$e}', $e);
                 }
 
                 if (PEAR::isError($response)) {
@@ -1068,6 +1070,33 @@ class TPerformant {
                 } else {
                 		return $response->getBody();
                 }
+        }
+        function logJsonError() {
+            echo Yii::trace("============ERRROR================");
+                switch (json_last_error()) {
+                case JSON_ERROR_NONE:
+                    echo Yii::trace(' - No errors');
+                break;
+                case JSON_ERROR_DEPTH:
+                    echo Yii::trace(' - Maximum stack depth exceeded');
+                break;
+                case JSON_ERROR_STATE_MISMATCH:
+                    echo Yii::trace(' - Underflow or the modes mismatch');
+                break;
+                case JSON_ERROR_CTRL_CHAR:
+                    echo Yii::trace(' - Unexpected control character found');
+                break;
+                case JSON_ERROR_SYNTAX:
+                    echo Yii::trace(' - Syntax error, malformed JSON');
+                break;
+                case JSON_ERROR_UTF8:
+                    echo Yii::trace(' - Malformed UTF-8 characters, possibly incorrectly encoded');
+                break;
+                default:
+                    echo Yii::trace(' - Unknown error');
+                break;
+            }
+            echo Yii::trace("============ERRROR================");
         }
 
 }
