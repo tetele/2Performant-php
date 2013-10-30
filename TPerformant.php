@@ -1072,31 +1072,29 @@ class TPerformant {
                 }
         }
         function logJsonError() {
-            echo Yii::trace("============ERRROR================");
-                switch (json_last_error()) {
+            switch (json_last_error()) {
                 case JSON_ERROR_NONE:
-                    echo Yii::trace(' - No errors');
+                    error_log('JSON_ERROR - No errors');
                 break;
                 case JSON_ERROR_DEPTH:
-                    echo Yii::trace(' - Maximum stack depth exceeded');
+                    error_log('JSON_ERROR - Maximum stack depth exceeded');
                 break;
                 case JSON_ERROR_STATE_MISMATCH:
-                    echo Yii::trace(' - Underflow or the modes mismatch');
+                    error_log('JSON_ERROR - Underflow or the modes mismatch');
                 break;
                 case JSON_ERROR_CTRL_CHAR:
-                    echo Yii::trace(' - Unexpected control character found');
+                    error_log('JSON_ERROR - Unexpected control character found');
                 break;
                 case JSON_ERROR_SYNTAX:
-                    echo Yii::trace(' - Syntax error, malformed JSON');
+                    error_log('JSON_ERROR - Syntax error, malformed JSON');
                 break;
                 case JSON_ERROR_UTF8:
-                    echo Yii::trace(' - Malformed UTF-8 characters, possibly incorrectly encoded');
+                    error_log('JSON_ERROR - Malformed UTF-8 characters, possibly incorrectly encoded');
                 break;
                 default:
-                    echo Yii::trace(' - Unknown error');
+                    error_log('JSON_ERROR - Unknown error');
                 break;
             }
-            echo Yii::trace("============ERRROR================");
         }
 
 }
