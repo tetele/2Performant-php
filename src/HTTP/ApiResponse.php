@@ -19,12 +19,12 @@ class ApiResponse implements AuthInterface {
 
     /**
      * Constructor
-     * @param Guzzle\Psr7\Respone   $response   The API response
-     * @param string                $expected   Key of main response container in response hash
+     * @param Psr\Http\Message\ResponseInterface    $response   The API response
+     * @param string                                $expected   Key of main response container in response hash
      *
-     * @param HTTP\User             $user       The user making the call
+     * @param HTTP\User                             $user       The user making the call
      */
-    public function __construct($response, $expected, User $user = null) {
+    public function __construct(\Psr\Http\Message\ResponseInterface $response, $expected, User $user = null) {
         $this->rawResponse = $response;
         $this->owner = $user;
 
@@ -187,7 +187,7 @@ class ApiResponse implements AuthInterface {
 
     /**
      * Get the raw respone
-     * @return Guzzle\Psr7\Response Response
+     * @return Psr\Http\Message\ResponseInterface Response
      */
     public function getResponse() {
         return $this->rawResponse;

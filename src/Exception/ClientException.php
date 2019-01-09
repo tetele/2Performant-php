@@ -3,7 +3,7 @@
 namespace TPerformant\API\Exception;
 
 class ClientException extends APIException {
-    public static function create(\GuzzleHttp\Exception\ClientException $e) {
+    public static function create(\Http\Client\Common\Exception\ClientErrorException $e) {
         $message = sprintf(
             'Request could not be processed (%s %s): %s on %s',
             $e->getResponse()->getStatusCode(),

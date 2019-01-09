@@ -2,7 +2,11 @@
 
 namespace TPerformant\API;
 
-use GuzzleHttp\Client as HTTPClient;
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\MessageFactoryDiscovery;
+use Http\Discovery\UriFactoryDiscovery;
+use Http\Client\Common\PluginClient;
+use Http\Client\Common\Plugin\ErrorPlugin;
 use TPerformant\API\Exception\ConnectionException;
 use TPerformant\API\Exception\APIException;
 use TPerformant\API\HTTP\ApiResponse;
@@ -34,6 +38,10 @@ class Api {
     private $apiUrl;
 
     private $http = null;
+    private $messageFactory = null;
+    private $uriFactory = null;
+
+    private $httpOptions = [];
 
 
     /**
@@ -45,7 +53,6 @@ class Api {
         $this->apiUrl = $baseUrl;
 
         $httpOptions = [
-            'base_uri' => $this->apiUrl,
             'headers' => [
                 'User-Agent' => 'TP-PHP-API:' . __CLASS__ . '-v' . self::WRAPPER_VERSION,
                 'Content-Type' => 'application/json'
@@ -58,7 +65,16 @@ class Api {
         if(!isset($httpOptions['timeout']) || 0 == $httpOptions['timeout'])
             $httpOptions['timeout'] = 5.0;
 
-        $this->http = new HTTPClient($httpOptions);
+        $this->httpOptions = $httpOptions;
+
+        $errorPlugin = new ErrorPlugin();
+
+        $this->http = new PluginClient(
+            HttpClientDiscovery::find(),
+            [$errorPlugin]
+        );
+        $this->messageFactory = MessageFactoryDiscovery::find();
+        $this->uriFactory = UriFactoryDiscovery::find();
     }
 
     /**
@@ -423,36 +439,41 @@ class Api {
      * @return ApiResponse
      */
     public function request($method, $route, $params, $expected, AuthInterface $auth = null) {
-        $url = $this->getUrl($route);
+        $url = $this->uriFactory->createUri($this->getUrl($route));
 
-        $requestOptions = [];
+        $headers = [];
 
         // authentication headers
         if($auth) {
-            $requestOptions['headers'] = [
+            $headers = [
                 'access-token' => $auth->getAccessToken(),
                 'client' => $auth->getClientToken(),
                 'uid' => $auth->getUid()
             ];
         }
 
+        $request = null;
+
         // request body
         if('GET' === $method) {
-            $requestOptions['query'] = $params;
+            $url = $url->withQuery(http_build_query($params));
+            $request = $this->prepareRequest($this->messageFactory->createRequest($method, $url, $headers));
         } else {
-            $requestOptions['json'] = $params;
+            $request = $this->prepareRequest($this->messageFactory->createRequest($method, $url, $headers, json_encode($params)));
         }
 
+
+
         try {
-            $response = $this->http->request($method, $url, $requestOptions);
-        } catch(\GuzzleHttp\Exception\ServerException $e) {
+            $response = $this->http->sendRequest($request);
+        } catch(\Http\Client\Common\Exception\ServerErrorException $e) {
             throw \TPerformant\API\Exception\ServerException::create($e);
-        } catch(\GuzzleHttp\Exception\BadResponseException $e) {
+        } catch(\Http\Client\Common\Exception\ClientErrorException $e) {
             // do nothing, validation will be performed later
             $response = $e->getResponse();
-        } catch(\GuzzleHttp\Exception\ConnectException $e) {
+        } catch(\Http\Client\Exception\NetworkException $e) {
             throw \TPerformant\API\Exception\ConnectionException::create($e);
-        } catch(\GuzzleHttp\Exception\TransferException $e) {
+        } catch(\Http\Client\Exception\TransferException $e) {
             throw new \TPerformant\API\Exception\TransferException($e->getMessage(), $e->getCode());
         }
 
@@ -519,7 +540,22 @@ class Api {
      */
     protected function getUrl($route) {
         // TODO extend this in case we switch to versioned URLs
-        return $route . '.json';
+        return $this->uriFactory->createUri($this->apiUrl . $route . '.json');
+    }
+
+    /**
+     * API wrapper signature information decorator
+     * @param  \Psr\Http\Message\RequestInterface   $request Request to be decorated
+     *
+     * @return \Psr\Http\Message\RequestInterface   The request signed by the API wrapper
+     */
+    protected function prepareRequest($request) {
+        if(array_key_exists('headers', $this->httpOptions) && is_array($this->httpOptions['headers'])) {
+            foreach($this->httpOptions['headers'] as $key => $value) {
+                $request = $request->withHeader($key, $value);
+            }
+        }
+        return $request;
     }
 
 

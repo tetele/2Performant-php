@@ -3,7 +3,7 @@
 namespace TPerformant\API\Exception;
 
 class ServerException extends APIException {
-    public static function create(\GuzzleHttp\Exception\ServerException $e) {
+    public static function create(\Http\Client\Common\Exception\ServerErrorException $e) {
         $message = sprintf(
             'API server error (%s %s): %s on %s',
             $e->getResponse()->getStatusCode(),
