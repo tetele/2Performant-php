@@ -1,9 +1,9 @@
 {
-    "name": "2performant/2performant-php",
+    "name": "tetele/2performant-php",
     "description": "PHP wrapper for 2Performant API",
     "type": "library",
     "keywords": ["2Performant", "API", "PHP", "HTTP", "REST"],
-    "homepage": "http://github.com/2Parale/2Performant-PHP",
+    "homepage": "http://github.com/tetele/2Performant-PHP",
     "license": "MIT",
     "authors": [
         {
