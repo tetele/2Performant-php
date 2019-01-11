@@ -462,15 +462,16 @@ class Api {
 
     /**
      * Make an API request
-     * @param  string           $method     One of GET, POST, PUT, DELETE
-     * @param  string           $route      The API endpoint to be requested
-     * @param  array            $params     Associative array of parameters
-     * @param  string           $expected   Expected object key in response hash
-     * @param  AuthInterface    $auth       The authentication token container. Not needed for sign in requests
+     * @param  string           $method         One of GET, POST, PUT, DELETE
+     * @param  string           $route          The API endpoint to be requested
+     * @param  array            $params         Associative array of parameters
+     * @param  string           $expected       Expected object key in response hash
+     * @param  AuthInterface    $auth           The authentication token container. Not needed for sign in requests
+     * @param  string           $overrideClass  If the expected object does not signal the class properly, use this as a replacement
      *
      * @return ApiResponse
      */
-    public function request($method, $route, $params, $expected, AuthInterface $auth = null) {
+    public function request($method, $route, $params, $expected, AuthInterface $auth = null, $overrideClass = null) {
         $url = $this->uriFactory->createUri($this->getUrl($route));
 
         $headers = [];
@@ -509,59 +510,63 @@ class Api {
             throw new \TPerformant\API\Exception\TransferException($e->getMessage(), $e->getCode());
         }
 
-        return new ApiResponse($response, $expected, $auth);
+        return new ApiResponse($response, $expected, $auth, $overrideClass);
     }
 
     /**
      * Shorthand for API GET request
-     * @param  string           $route      The API endpoint to be requested
-     * @param  array            $params     Associative array of parameters
-     * @param  string           $expected   Expected object key in response hash
-     * @param  AuthInterface    $auth       The authentication token container. Not needed for sign in requests
+     * @param  string           $route          The API endpoint to be requested
+     * @param  array            $params         Associative array of parameters
+     * @param  string           $expected       Expected object key in response hash
+     * @param  AuthInterface    $auth           The authentication token container. Not needed for sign in requests
+     * @param  string           $overrideClass  If the expected object does not signal the class properly, use this as a replacement
      *
      * @return ApiResponse
      */
-    public function get($route, $params, $expected, AuthInterface $auth = null) {
-        return $this->request('GET', $route, $params, $expected, $auth);
+    public function get($route, $params, $expected, AuthInterface $auth = null, $overrideClass = null) {
+        return $this->request('GET', $route, $params, $expected, $auth, $overrideClass);
     }
 
     /**
      * Shorthand for API POST request
-     * @param  string           $route      The API endpoint to be requested
-     * @param  array            $params     Associative array of parameters
-     * @param  string           $expected   Expected object key in response hash
-     * @param  AuthInterface    $auth       The authentication token container. Not needed for sign in requests
+     * @param  string           $route          The API endpoint to be requested
+     * @param  array            $params         Associative array of parameters
+     * @param  string           $expected       Expected object key in response hash
+     * @param  AuthInterface    $auth           The authentication token container. Not needed for sign in requests
+     * @param  string           $overrideClass  If the expected object does not signal the class properly, use this as a replacement
      *
      * @return ApiResponse
      */
-    public function post($route, $params, $expected, AuthInterface $auth = null) {
-        return $this->request('POST', $route, $params, $expected, $auth);
+    public function post($route, $params, $expected, AuthInterface $auth = null, $overrideClass = null) {
+        return $this->request('POST', $route, $params, $expected, $auth, $overrideClass);
     }
 
     /**
      * Shorthand for API PUT request
-     * @param  string           $route      The API endpoint to be requested
-     * @param  array            $params     Associative array of parameters
-     * @param  string           $expected   Expected object key in response hash
-     * @param  AuthInterface    $auth       The authentication token container. Not needed for sign in requests
+     * @param  string           $route          The API endpoint to be requested
+     * @param  array            $params         Associative array of parameters
+     * @param  string           $expected       Expected object key in response hash
+     * @param  AuthInterface    $auth           The authentication token container. Not needed for sign in requests
+     * @param  string           $overrideClass  If the expected object does not signal the class properly, use this as a replacement
      *
      * @return ApiResponse
      */
-    public function put($route, $params, $expected, AuthInterface $auth = null) {
-        return $this->request('PUT', $route, $params, $expected, $auth);
+    public function put($route, $params, $expected, AuthInterface $auth = null, $overrideClass = null) {
+        return $this->request('PUT', $route, $params, $expected, $auth, $overrideClass);
     }
 
     /**
      * Shorthand for API DELETE request
-     * @param  string           $route      The API endpoint to be requested
-     * @param  array            $params     Associative array of parameters
-     * @param  string           $expected   Expected object key in response hash
-     * @param  AuthInterface    $auth       The authentication token container. Not needed for sign in requests
+     * @param  string           $route          The API endpoint to be requested
+     * @param  array            $params         Associative array of parameters
+     * @param  string           $expected       Expected object key in response hash
+     * @param  AuthInterface    $auth           The authentication token container. Not needed for sign in requests
+     * @param  string           $overrideClass  If the expected object does not signal the class properly, use this as a replacement
      *
      * @return ApiResponse
      */
-    public function delete($route, $params, $expected, AuthInterface $auth = null) {
-        return $this->request('DELETE', $route, $params, $expected, $auth);
+    public function delete($route, $params, $expected, AuthInterface $auth = null, $overrideClass = null) {
+        return $this->request('DELETE', $route, $params, $expected, $auth, $overrideClass);
     }
 
     /**

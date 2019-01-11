@@ -19,12 +19,13 @@ class ApiResponse implements AuthInterface {
 
     /**
      * Constructor
-     * @param Psr\Http\Message\ResponseInterface    $response   The API response
-     * @param string                                $expected   Key of main response container in response hash
+     * @param Psr\Http\Message\ResponseInterface    $response       The API response
+     * @param string                                $expected       Key of main response container in response hash
      *
-     * @param HTTP\User                             $user       The user making the call
+     * @param HTTP\User                             $user           The user making the call
+     * @param HttpQueryString                       $overrideClass  The explicit class name of the expected result
      */
-    public function __construct(\Psr\Http\Message\ResponseInterface $response, $expected, User $user = null) {
+    public function __construct(\Psr\Http\Message\ResponseInterface $response, $expected, User $user = null, $overrideClass = null) {
         $this->rawResponse = $response;
         $this->owner = $user;
 
@@ -57,7 +58,7 @@ class ApiResponse implements AuthInterface {
             );
         }
 
-        $this->body = $this->_convert($data->$expected, $expected);
+        $this->body = $this->_convert($data->$expected, $expected, $overrideClass);
     }
 
     /**
@@ -196,17 +197,29 @@ class ApiResponse implements AuthInterface {
 
     /**
      * Converts a parsed response to a structured class defined among the models
-     * @param  stdClass $data       Source unstructured data
-     * @param  string   $expected   Expected value (singular or plural)
+     * @param  stdClass $data           Source unstructured data
+     * @param  string   $expected       Expected value (singular or plural)
+     * @param  string   $overrideClass  Explicit class name of the expected result
      * @return mixed                The structured data
      */
-    private function _convert($data, $expected) {
+    private function _convert($data, $expected, $overrideClass = null) {
         // If we are expecting a user, set the class directly
         if('user' == $expected && isset($data->role)) {
             $className = $this->getClassName($data->role);
 
             if(class_exists($className)) {
                 return new $className($data, $this->owner);
+            }
+        }
+
+        // If an override class is provided, use that
+        if($overrideClass !== null) {
+            $className = $this->getClassName($this->owner->getRole() .  '_' . $overrideClass);
+
+            if(class_exists($className)) {
+                return new $className($data, $this->owner);
+            } else {
+                throw new APIException("Class {$className} not found, expecting object of type {$overrideClass}");
             }
         }
 
