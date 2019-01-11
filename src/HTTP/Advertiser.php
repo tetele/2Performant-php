@@ -176,4 +176,8 @@ class Advertiser extends User {
     public function getAffiliate($id) {
         return $this->updateAuthTokensAndReturn(Api::getInstance()->getAdvertiserAffiliate($this, $id));
     }
+
+    public function getTrackingCode() {
+        return $this->updateAuthTokensAndReturn(Api::getInstance()->getAdvertiserTrackingCode($this));
+    }
 }

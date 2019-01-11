@@ -317,6 +317,16 @@ class Api {
         return $this->get('/advertiser/programs/default/affiliates/'.$id, [], 'affiliate', $auth);
     }
 
+    /**
+     * Get tracking code information for own program
+     * @param  AuthInterface    $auth   The authentication token container
+     *
+     * @return ApiResponse
+     */
+    public function getAdvertiserTrackingCode(AuthInterface $auth) {
+        return $this->get('/advertiser/programs/default/tracking_code', [], 'campaign', $auth, 'tracking_code');
+    }
+
 
     // Affiliate methods
 
