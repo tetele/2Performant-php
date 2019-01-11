@@ -15,6 +15,8 @@ use TPerformant\API\Filter\AdvertiserProgramFilter;
 use TPerformant\API\Filter\AdvertiserProgramSort;
 use TPerformant\API\Filter\AdvertiserCommissionFilter;
 use TPerformant\API\Filter\AdvertiserCommissionSort;
+use TPerformant\API\Filter\AdvertiserAffiliateFilter;
+use TPerformant\API\Filter\AdvertiserAffiliateSort;
 use TPerformant\API\Filter\AffiliateProgramFilter;
 use TPerformant\API\Filter\AffiliateProgramSort;
 use TPerformant\API\Filter\AffiliateCommissionFilter;
@@ -283,6 +285,36 @@ class Api {
         ];
 
         return $this->put('/advertiser/programs/default/commissions/'.$id.'/reject', $params, 'commission', $auth);
+    }
+
+    /**
+     * Get own affiliate list as an advertiser
+     * @param  AuthInterface                $auth   The authentication token container
+     * @param  AdvertiserAffiliateFilter    $filter (optional) Result filtering options
+     * @param  AdvertiserAffiliateSort      $sort   (optional) Result sorting options
+     *
+     * @return ApiResponse
+     */
+    public function getAdvertiserAffiliates(AuthInterface $auth, AdvertiserAffiliateFilter $filter = null, AdvertiserAffiliateSort $sort = null) {
+        $params = [];
+        if($filter)
+            $params = array_merge($params, $filter->toParams());
+
+        if($sort)
+            $params = array_merge($params, $sort->toParams());
+
+        return $this->get('/advertiser/programs/default/affiliates', $params, 'affiliates', $auth);
+    }
+
+    /**
+     * Get a single affiliate as an advertiser
+     * @param  AuthInterface    $auth   The authentication token container
+     * @param  string           $id     The unique code of the affiliate
+     *
+     * @return ApiResponse
+     */
+    public function getAdvertiserAffiliate(AuthInterface $auth, $id) {
+        return $this->get('/advertiser/programs/default/affiliates/'.$id, [], 'affiliate', $auth);
     }
 
 

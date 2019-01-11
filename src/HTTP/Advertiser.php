@@ -9,6 +9,8 @@ use TPerformant\API\Filter\AdvertiserProgramFilter;
 use TPerformant\API\Filter\AdvertiserProgramSort;
 use TPerformant\API\Filter\AdvertiserCommissionFilter;
 use TPerformant\API\Filter\AdvertiserCommissionSort;
+use TPerformant\API\Filter\AdvertiserAffiliateFilter;
+use TPerformant\API\Filter\AdvertiserAffiliateSort;
 
 /**
  * Authentication/authorization class for advertisers
@@ -152,5 +154,26 @@ class Advertiser extends User {
      */
     public function rejectCommission($id, $reason) {
         return $this->updateAuthTokensAndReturn(Api::getInstance()->rejectAdvertiserCommission($this, $id, $reason));
+    }
+
+    /**
+     * Get own affiliate list
+     * @param  AdvertiserAffiliateFilter   $filter (optional) Result filtering options
+     * @param  AdvertiserAffiliateSort     $sort   (optional) Result sorting options
+     *
+     * @return AdvertiserCommision[]
+     */
+    public function getAffiliates(AdvertiserAffiliateFilter $filter = null, AdvertiserAffiliateSort $sort = null) {
+        return $this->updateAuthTokensAndReturn(Api::getInstance()->getAdvertiserAffiliates($this, $filter, $sort));
+    }
+
+    /**
+     * Get a single affiliate
+     * @param  int|string       $id     The unique code of the affiliate
+     *
+     * @return AdvertiserAffiliate
+     */
+    public function getAffiliate($id) {
+        return $this->updateAuthTokensAndReturn(Api::getInstance()->getAdvertiserAffiliate($this, $id));
     }
 }

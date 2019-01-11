@@ -13,6 +13,16 @@ class AdvertiserCommission extends Commission {
     }
 
     protected $transactionId;
+    protected $user = null;
+
+    /**
+     * @inheritdoc
+     */
+    protected function classMap() {
+        return array_merge(parent::classMap(), [
+            'user' => 'AdvertiserAffiliate'
+        ]);
+    }
 
     /**
      * Edit a commission's amount
